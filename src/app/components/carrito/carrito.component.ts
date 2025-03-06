@@ -1,6 +1,7 @@
 import { Component, OnInit} from '@angular/core';
 import { CarritoService } from '../../services/carrito.service';
 import { CommonModule } from '@angular/common';
+import { Producto } from '../../models/producto';
 
 @Component({
   selector: 'app-carrito',
@@ -9,14 +10,19 @@ import { CommonModule } from '@angular/common';
   templateUrl: './carrito.component.html',
   styleUrl : './carrito.component.css'})
   export class CarritoComponent implements OnInit {
-    productos: any[]=[];
+    carrito: any[]=[];
     constructor(private carritoService:CarritoService){}
     ngOnInit():void{
-      this.productos = this.carritoService.obtenerCarrito();
+      this.carrito = this.carritoService.obtenerCarrito();
     }
     eliminarProducto(index:number){
       this.carritoService.eliminarProducto(index);
     }
-  generarXML(){
-    this.carritoService.generarXML();
-  }}
+    generarDescargarXML(){
+      const xml = this.carritoService.generarXML();
+      this.carritoService.descargarXML(xml);
+    }
+
+    
+    
+}
