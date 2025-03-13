@@ -3,38 +3,59 @@ import { Producto } from '../models/producto';
 import { map, Observable, of } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { isPlatformBrowser } from '@angular/common';
-
+import { catchError } from 'rxjs/operators';
+import { BehaviorSubject } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
 export class InventarioService {
   private xmlUrl = 'assets/productos.xml'; // Ruta al archivo XML
   private productos: Producto[] = [];
-
+  private productosSubject = new BehaviorSubject<Producto[]>([]);
+  productos$ = this.productosSubject.asObservable();
+  
   constructor(
     private http: HttpClient,
-    @Inject(PLATFORM_ID) private platformId: Object // Inyectar PLATFORM_ID para verificar si estamos en el navegador
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {
-    this.cargarProductosDesdeXML().subscribe(productos => {
-      this.productos = productos;
+    this.cargarProductosDesdeXML().subscribe({
+      next: (productos) => {
+        this.productos = productos;
+        this.productosSubject.next(productos); // Notificar que los productos están listos
+      },
+      error: (error) => {
+        console.error('Error al cargar productos:', error);
+      }
     });
   }
-
   private cargarProductosDesdeXML(): Observable<Producto[]> {
     return this.http.get(this.xmlUrl, { responseType: 'text' }).pipe(
       map((xml) => {
-        if (isPlatformBrowser(this.platformId)) { // Verificar si estamos en el navegador
-          const parser = new DOMParser();
-          const xmlDoc = parser.parseFromString(xml, 'text/xml');
-          const productos = Array.from(xmlDoc.querySelectorAll('producto')).map((prod) => ({
-            id: Number(prod.getElementsByTagName('id')[0]?.textContent) || 0, // Convertir a número
-            nombre: prod.getElementsByTagName('nombre')[0]?.textContent ?? 'Sin nombre',
-            precioP: Number(prod.getElementsByTagName('precio')[0]?.textContent) || 0, // Convertir a número
-            imagen: prod.getElementsByTagName('imagen')[0]?.textContent ?? 'sin_imagen.jpg'
-          }));
-          return productos;
+        if (isPlatformBrowser(this.platformId)) {
+          try {
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(xml, 'text/xml');
+            console.log('XML cargado:', xmlDoc); // Depuración
+  
+            const productos = Array.from(xmlDoc.querySelectorAll('producto')).map((prod) => ({
+              id: Number(prod.getElementsByTagName('id')[0]?.textContent) || 0,
+              nombre: prod.getElementsByTagName('nombre')[0]?.textContent ?? 'Sin nombre',
+              precioP: Number(prod.getElementsByTagName('precio')[0]?.textContent) || 0,
+              imagen: prod.getElementsByTagName('imagen')[0]?.textContent ?? 'sin_imagen.jpg'
+            }));
+  
+            console.log('Productos parseados:', productos); // Depuración
+            return productos;
+          } catch (error) {
+            console.error('Error al parsear el XML:', error);
+            return [];
+          }
         }
-        return []; // Si no estamos en el navegador, devolver un arreglo vacío
+        return [];
+      }),
+      catchError((error) => {
+        console.error('Error al cargar el XML:', error);
+        return of([]); // Devuelve un arreglo vacío en caso de error
       })
     );
   }
