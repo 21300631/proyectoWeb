@@ -1,0 +1,19 @@
+<h2>Inventario</h2>
+
+<!-- Formulario para agregar productos -->
+<div class="form">
+  <input type="text" [(ngModel)]="nuevoProducto.nombre" placeholder="Nombre del producto">
+  <input type="number" [(ngModel)]="nuevoProducto.precioP" placeholder="Precio">
+  <input type="text" [(ngModel)]="nuevoProducto.imagen" placeholder="URL de imagen">
+  <button (click)="agregarProducto()">Agregar Producto</button>
+</div>
+
+<!-- Lista de productos en inventario -->
+<div class="productos">
+  <div *ngFor="let producto of productos" class="producto">
+    <img [src]="producto.imagen" alt="">
+    <h3>{{ producto.nombre }}</h3>
+    <p>Precio: ${{ producto.precioP }}</p>
+    <button (click)="eliminarProducto(producto.id)">Eliminar</button>
+  </div>
+</div>

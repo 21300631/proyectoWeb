@@ -37,9 +37,11 @@ export class CarritoService {
       xml += `        </producto>\n`;
     });
     xml += `    </Detalles>\n`;
-    let subtotal = this.carrito.reduce((sum, producto) => sum + producto.precioP, 0);
+
+    let subtotal = this.carrito.reduce((sum, producto) => sum + Number(producto.precioP), 0);
     let iva = subtotal * 0.16;
     let total = subtotal + iva;
+    
     xml += `    <Totales>\n`;
     xml += `      <subtotal>${subtotal.toFixed(2)}</subtotal>\n`;
     xml += `      <iva>${iva.toFixed(2)}</iva>\n`;
