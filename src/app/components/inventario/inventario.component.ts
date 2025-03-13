@@ -79,5 +79,8 @@ export class InventarioComponent implements OnInit {
       this.productos = productos;
     });
   }
+  descargarXML(): void {
+    this.inventarioService.descargarXML();
+  }
 
 }

@@ -99,7 +99,22 @@ export class InventarioService {
         <imagen>${prod.imagen}</imagen>
       </producto>
     `).join('');
-
+  
     return `${xmlHeader}<productos>${productosXML}</productos>`;
+  }
+  
+  descargarXML(): void {
+    const xmlString = this.generarXMLDesdeProductos(this.productos);
+    const blob = new Blob([xmlString], { type: 'application/xml' });
+    const url = window.URL.createObjectURL(blob);
+  
+    // Crear un enlace temporal para la descarga
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'inventario.xml'; // Nombre del archivo
+    document.body.appendChild(a);
+    a.click(); // Simular clic en el enlace
+    document.body.removeChild(a); // Eliminar el enlace temporal
+    window.URL.revokeObjectURL(url); // Liberar el objeto URL
   }
 }
