@@ -5,6 +5,7 @@
   <input type="text" [(ngModel)]="nuevoProducto.nombre" placeholder="Nombre del producto">
   <input type="number" [(ngModel)]="nuevoProducto.precioP" placeholder="Precio">
   <input type="text" [(ngModel)]="nuevoProducto.imagen" placeholder="URL de imagen">
+  <input type="text" [(ngModel)]="nuevoProducto.cantidad" placeholder="cantidad">
   <button (click)="agregarProducto()">Agregar Producto</button>
 </div>
 
@@ -25,6 +26,7 @@
   <input type="text" [(ngModel)]="productoSeleccionado.nombre" placeholder="Nombre del producto">
   <input type="number" [(ngModel)]="productoSeleccionado.precioP" placeholder="Precio">
   <input type="text" [(ngModel)]="productoSeleccionado.imagen" placeholder="URL de imagen">
+  <input type="text" [(ngModel)]="nuevoProducto.cantidad" placeholder="cantidad">
   <button (click)="guardarCambios()">Guardar Cambios</button>
   <button (click)="cancelarEdicion()">Cancelar</button>
 </div>

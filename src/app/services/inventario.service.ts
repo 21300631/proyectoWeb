@@ -5,11 +5,13 @@ import { HttpClient } from '@angular/common/http';
 import { isPlatformBrowser } from '@angular/common';
 import { catchError } from 'rxjs/operators';
 import { BehaviorSubject } from 'rxjs';
+import { HttpClientModule } from '@angular/common/http';
+
 @Injectable({
   providedIn: 'root'
 })
 export class InventarioService {
-  private xmlUrl = 'assets/productos.xml'; // Ruta al archivo XML
+  private xmlUrl = 'assets/productos.xml'; 
   private productos: Producto[] = [];
   private productosSubject = new BehaviorSubject<Producto[]>([]);
   productos$ = this.productosSubject.asObservable();
@@ -21,7 +23,7 @@ export class InventarioService {
     this.cargarProductosDesdeXML().subscribe({
       next: (productos) => {
         this.productos = productos;
-        this.productosSubject.next(productos); // Notificar que los productos están listos
+        this.productosSubject.next(productos); 
       },
       error: (error) => {
         console.error('Error al cargar productos:', error);
@@ -35,13 +37,15 @@ export class InventarioService {
           try {
             const parser = new DOMParser();
             const xmlDoc = parser.parseFromString(xml, 'text/xml');
-            console.log('XML cargado:', xmlDoc); // Depuración
+            console.log('XML cargado:', xmlDoc); 
   
             const productos = Array.from(xmlDoc.querySelectorAll('producto')).map((prod) => ({
               id: Number(prod.getElementsByTagName('id')[0]?.textContent) || 0,
               nombre: prod.getElementsByTagName('nombre')[0]?.textContent ?? 'Sin nombre',
               precioP: Number(prod.getElementsByTagName('precio')[0]?.textContent) || 0,
-              imagen: prod.getElementsByTagName('imagen')[0]?.textContent ?? 'sin_imagen.jpg'
+              imagen: prod.getElementsByTagName('imagen')[0]?.textContent ?? 'sin_imagen.jpg',
+              cantidad: Number(prod.getElementsByTagName('cantidad')[0]?.textContent) ?? 0
+
             }));
   
             console.log('Productos parseados:', productos); // Depuración
@@ -55,7 +59,7 @@ export class InventarioService {
       }),
       catchError((error) => {
         console.error('Error al cargar el XML:', error);
-        return of([]); // Devuelve un arreglo vacío en caso de error
+        return of([]);
       })
     );
   }
@@ -97,6 +101,7 @@ export class InventarioService {
         <nombre>${prod.nombre}</nombre>
         <precio>${prod.precioP}</precio>
         <imagen>${prod.imagen}</imagen>
+        <cantidad>${prod.cantidad}</cantidad>
       </producto>
     `).join('');
   

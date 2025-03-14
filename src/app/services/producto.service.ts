@@ -13,7 +13,7 @@ export class ProductoService {
 
   constructor(
     private http: HttpClient,
-    @Inject(PLATFORM_ID) private platformId: Object // Inject PLATFORM_ID to check the platform
+    @Inject(PLATFORM_ID) private platformId: Object 
   ) {}
 
   obtenerProductos(): Observable<any[]> {
@@ -25,9 +25,9 @@ export class ProductoService {
           const productos = Array.from(xmlDoc.querySelectorAll('producto')).map((prod) => ({
             id: prod.getElementsByTagName('id')[0]?.textContent ?? 'Desconocido',
             nombre: prod.getElementsByTagName('nombre')[0]?.textContent ?? 'Sin nombre',
-            precioP: prod.getElementsByTagName('precio')[0]?.textContent ?? '0', // Si no tiene precio, usa 0 por defecto
-            cantidad: prod.getElementsByTagName('cantidad')[0]?.textContent ?? '0', // Si no tiene cantidad, usa 0 por defecto
-            imagen: prod.getElementsByTagName('imagen')[0]?.textContent ?? 'sin_imagen.jpg' // Si no tiene imagen, usa una imagen por defecto
+            precioP: prod.getElementsByTagName('precio')[0]?.textContent ?? '0', 
+            cantidad: prod.getElementsByTagName('cantidad')[0]?.textContent ?? '0', 
+            imagen: prod.getElementsByTagName('imagen')[0]?.textContent ?? 'sin_imagen.jpg'
           }));
           
           return productos;

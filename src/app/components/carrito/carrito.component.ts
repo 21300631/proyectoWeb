@@ -21,8 +21,6 @@ import { Producto } from '../../models/producto';
     generarDescargarXML(){
       const xml = this.carritoService.generarXML();
       this.carritoService.descargarXML(xml);
-    }
-
-    
+    }  
     
 }
