@@ -1,18 +1,23 @@
-<h2>Carrito de Compras</h2>
-<div *ngIf="carrito.length > 0">
-    <ul>
-        <li *ngFor="let producto of carrito; let i = index">
+<div class="carrito-container">
+    <h2>Carrito de Compras</h2>
+    <div *ngIf="carrito.length > 0">
+      <ul class="carrito-lista">
+        <li *ngFor="let producto of carrito; let i = index" class="carrito-item">
+          <img [src]="producto.imagen" alt="{{ producto.nombre }}" />
+          <div class="carrito-item-info">
             {{ producto.nombre }} - ${{ producto.precioP }}
-            <input
-                type="number"
-                [value]="producto.cantidad"
-                (change)="actualizarCantidad(producto.id, $event)"
-                min="1"
-                [max]="producto.cantidad"
-            />
-            <button (click)="eliminarProducto(i)">Eliminar</button>
+          </div>
+          <input
+            type="number"
+            [value]="producto.cantidad"
+            (change)="actualizarCantidad(producto.id, $event)"
+            min="1"
+            [max]="producto.cantidad"
+          />
+          <button (click)="eliminarProducto(i)">Eliminar</button>
         </li>
-    </ul>
-    <button (click)="generarDescargarXML()">Recibo</button>
-</div>
-<p *ngIf="carrito.length === 0">El carrito está vacío</p>
+      </ul>
+      <button type="button" (click)="generarDescargarXML()">Generar Recibo</button>
+    </div>
+    <p *ngIf="carrito.length === 0" class="carrito-vacio">El carrito está vacío</p>
+  </div>
