@@ -1,38 +1,22 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs';
-import { isPlatformBrowser } from '@angular/common';
-import { Inject, PLATFORM_ID } from '@angular/core';
+import { Observable, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
+import { Producto } from '../models/producto';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProductoService {
-  private xmlUrl = 'assets/productos.xml';
+  private apiUrl = 'http://localhost:3000/productos'; // Usa el mismo endpoint que InventarioService
 
-  constructor(
-    private http: HttpClient,
-    @Inject(PLATFORM_ID) private platformId: Object 
-  ) {}
+  constructor(private http: HttpClient) {}
 
-  obtenerProductos(): Observable<any[]> {
-    return this.http.get(this.xmlUrl, { responseType: 'text' }).pipe(
-      map((xml) => {
-        if (isPlatformBrowser(this.platformId)) { 
-          const parser = new DOMParser();
-          const xmlDoc = parser.parseFromString(xml, 'text/xml');
-          const productos = Array.from(xmlDoc.querySelectorAll('producto')).map((prod) => ({
-            id: prod.getElementsByTagName('id')[0]?.textContent ?? 'Desconocido',
-            nombre: prod.getElementsByTagName('nombre')[0]?.textContent ?? 'Sin nombre',
-            precioP: prod.getElementsByTagName('precio')[0]?.textContent ?? '0', 
-            cantidad: prod.getElementsByTagName('cantidad')[0]?.textContent ?? '0', 
-            imagen: prod.getElementsByTagName('imagen')[0]?.textContent ?? 'sin_imagen.jpg'
-          }));
-          
-          return productos;
-        }
-        return []; 
+  obtenerProductos(): Observable<Producto[]> {
+    return this.http.get<Producto[]>(this.apiUrl).pipe(
+      catchError((error) => {
+        console.error('Error al obtener productos:', error);
+        return of([]); // Retorna un arreglo vacío en caso de error
       })
     );
   }

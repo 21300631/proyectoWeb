@@ -1,0 +1,25 @@
+{
+  "productos": [
+    {
+      "id": "1",
+      "nombre": "Transistor TIP35",
+      "precioP": 38.8,
+      "cantidad": 10,
+      "imagen": "assets/img/transistor.jpg"
+    },
+    {
+      "id": "2",
+      "nombre": "Resistencia 1k",
+      "precioP": 0.8,
+      "cantidad": 15,
+      "imagen": "assets/img/resistencia.jpg"
+    },
+    {
+      "id": 0,
+      "nombre": "Popo",
+      "precioP": 1000,
+      "imagen": "hols.jpg",
+      "cantidad": 10
+    }
+  ]
+}

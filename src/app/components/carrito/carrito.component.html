@@ -3,6 +3,13 @@
     <ul>
         <li *ngFor="let producto of carrito; let i = index">
             {{ producto.nombre }} - ${{ producto.precioP }}
+            <input
+                type="number"
+                [value]="producto.cantidad"
+                (change)="actualizarCantidad(producto.id, $event)"
+                min="1"
+                [max]="producto.cantidad"
+            />
             <button (click)="eliminarProducto(i)">Eliminar</button>
         </li>
     </ul>
