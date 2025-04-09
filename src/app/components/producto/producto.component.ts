@@ -11,20 +11,28 @@ import { InventarioService } from '../../services/inventario.service';
   selector: 'app-producto', 
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './producto.component.html',
+  templateUrl:  './producto.component.html',
   styleUrls: ['./producto.component.css']
 })
-export class ProductoComponent implements OnInit {
-  productos: Producto[] = [];
+
+
+export class AppComponent implements OnInit {
+  productos: any[] = []; // Cambia el tipo a any[] para evitar errores de tipo
 
   constructor(
     private productoService: ProductoService,
     private carritoService: CarritoService,
-    private router: Router
+    private router: Router,
+    private inventarioService: InventarioService // Inyecta el servicio de inventario
   ) {}
 
+  
+
   ngOnInit(): void {
-    this.cargarProductos();
+    this.productoService.obtenerProductos().subscribe( data=>{
+      this.productos = data as any[]; // Cambia el tipo a any[] para evitar errores de tipo
+    }
+    );
   }
 
   cargarProductos(): void {
