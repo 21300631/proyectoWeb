@@ -1,104 +1,79 @@
 import { Injectable } from '@angular/core';
 import { Producto } from '../models/producto';
-import { InventarioService } from './inventario.service'; // Importa el servicio de inventario
-import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CarritoService {
   private carrito: Producto[] = [];
-    private productosSubject = new BehaviorSubject<Producto[]>([]);
-  
-
-  constructor(private inventarioService: InventarioService) {}
-
-  agregarProducto(producto: Producto): void {
-    // Verifica si el producto ya está en el carrito
-    const productoEnCarrito = this.carrito.find((p) => p.id === producto.id);
-    if (productoEnCarrito) {
-      // Si ya está, aumenta la cantidad
-      productoEnCarrito.cantidad += 1;
-    } else {
-      // Si no está, agrégalo al carrito con cantidad 1
-      this.carrito.push({ ...producto, cantidad: 1 });
-    }
-  }
 
   obtenerCarrito(): Producto[] {
     return this.carrito;
   }
 
-  actualizarCantidad(productoId: number, nuevaCantidad: number): boolean {
-    const productoEnCarrito = this.carrito.find((p) => p.id === productoId);
+  // Agregar producto al carrito
+  agregarProducto(producto: Producto): void {
+    // Verificar si el producto ya está en el carrito
+    const productoEnCarrito = this.carrito.find((p) => p.id === producto.id);
     if (productoEnCarrito) {
-      // Obtén el stock disponible del inventario
-      const productoEnInventario = this.inventarioService.obtenerProductoPorId(productoId);
-      if (productoEnInventario && nuevaCantidad <= productoEnInventario.cantidad && nuevaCantidad > 0) {
-        productoEnCarrito.cantidad = nuevaCantidad;
-        return true; // Actualización exitosa
-      }
+      // Si el producto ya está, aumentar la cantidad
+      productoEnCarrito.cantidad += 1;
+    } else {
+      // Si no está, agregarlo con cantidad 1
+      this.carrito.push({ ...producto, cantidad: 1 });
     }
-    return false; // No se pudo actualizar
+
+    // Guardar el carrito actualizado en el localStorage
+    this.guardarCarrito();
   }
 
   eliminarProducto(index: number): void {
     this.carrito.splice(index, 1);
+    this.guardarCarrito();
   }
 
-  obtenerProductoPorId(id: number): Producto | undefined {
-    return this.productosSubject.value.find((p) => p.id === id);
+  vaciarCarrito(): void {
+    this.carrito = [];
+    this.guardarCarrito();
   }
 
   generarXML(): string {
-    let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<recibo>\n`;
-    xml += `  <Factura>\n`;
-    xml += `    <Encabezado>\n`;
-    xml += `      <Emisor>\n`;
-    xml += `        <Nombre>CETRIONIC digital</Nombre>\n`;
-    xml += `        <RFC>21300652</RFC>\n`;
-    xml += `        <Domicilio>Ceti Colomos #12</Domicilio>\n`;
-    xml += `      </Emisor>\n`;
-    xml += `      <Receptor>\n`;
-    xml += `        <Nombre>Paola Ponce</Nombre>\n`;
-    xml += `      </Receptor>\n`;
-    xml += `      <Fecha>2021-10-12</Fecha>\n`;
-    xml += `      <NumFactura>19011901</NumFactura>\n`;
-    xml += `    </Encabezado>\n`;
-    xml += `    <Detalles>\n`;
-    this.carrito.forEach((producto) => {
-      xml += `        <producto>\n`;
-      xml += `          <id>${producto.id}</id>\n`;
-      xml += `          <nombre>${producto.nombre}</nombre>\n`;
-      xml += `          <precio>${producto.precioP}</precio>\n`;
-      xml += `          <cantidad>${producto.cantidad}</cantidad>\n`;
-      xml += `        </producto>\n`;
-    });
-    xml += `    </Detalles>\n`;
+    const itemsXML = this.carrito.map(producto => `
+      <item>
+        <nombre>${producto.nombre}</nombre>
+        <precio>${producto.precioP}</precio>
+        <cantidad>${producto.cantidad}</cantidad>
+      </item>
+    `).join('');
 
-    let subtotal = this.carrito.reduce((sum, producto) => sum + Number(producto.precioP) * producto.cantidad, 0);
-    let iva = subtotal * 0.16;
-    let total = subtotal + iva;
-    
-    xml += `    <Totales>\n`;
-    xml += `      <subtotal>${subtotal.toFixed(2)}</subtotal>\n`;
-    xml += `      <iva>${iva.toFixed(2)}</iva>\n`;
-    xml += `      <total>${total.toFixed(2)}</total>\n`;
-    xml += `    </Totales>\n`;
-    xml += `  </Factura>\n`;
-    xml += `</recibo>`;
-  
-    return xml;
+    return `
+      <factura>
+        <fecha>${new Date().toISOString()}</fecha>
+        <items>
+          ${itemsXML}
+        </items>
+        <total>${this.calcularTotal()}</total>
+      </factura>
+    `;
   }
 
   descargarXML(xml: string): void {
     const blob = new Blob([xml], { type: 'application/xml' });
-    const url = URL.createObjectURL(blob);
+    const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'recibo.xml';
-    document.body.appendChild(a);
+    a.download = `factura-${new Date().getTime()}.xml`;
     a.click();
-    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  }
+
+  private calcularTotal(): number {
+    return this.carrito.reduce((total, producto) => {
+      return total + (producto.precioP * producto.cantidad);
+    }, 0);
+  }
+
+  private guardarCarrito(): void {
+    localStorage.setItem('carrito', JSON.stringify(this.carrito));
   }
 }

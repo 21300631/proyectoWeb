@@ -29,11 +29,22 @@ export class ProductoComponent implements OnInit {
 
   cargarProductos(): void {
     this.productoService.obtenerProductos().subscribe({
-      next: (productos) => {
-        this.productos = productos;
+      next: (response) => {
+        // Si la respuesta es directamente el array
+        if (Array.isArray(response)) {
+          this.productos = response;
+        } 
+        // Si la respuesta tiene un wrapper con propiedad 'data'
+        else if (response.data && Array.isArray(response.data)) {
+          this.productos = response.data;
+        }
+        // Si la estructura es diferente
+        else {
+          console.error('Estructura de respuesta inesperada:', response);
+        }
       },
-      error: (error) => {
-        console.error('Error al obtener productos:', error);
+      error: (err) => {
+        console.error('Error:', err);
       }
     });
   }

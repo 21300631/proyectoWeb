@@ -11,5 +11,3 @@ bootstrapApplication(AppComponent, {
     provideHttpClient(withFetch()) 
   ]
 }).catch(err => console.error(err));
-
-

@@ -2,14 +2,20 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db');
 
-// Obtener todos los productos (con async/await)
+// Obtener todos los productos
 router.get('/', async (req, res) => {
   try {
-    const [resultados] = await db.query('SELECT * FROM productos');
-    res.json(resultados);
+    const [productos] = await db.query('SELECT * FROM productos');
+    // Asegúrate de devolver un objeto JSON válido
+    res.json({ success: true, data: productos });
   } catch (err) {
     console.error(err);
-    res.status(500).send('Error al obtener productos');
+    // Devuelve un error en formato JSON
+    res.status(500).json({ 
+      success: false, 
+      message: 'Error al obtener productos',
+      error: err.message 
+    });
   }
 });
 

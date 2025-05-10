@@ -8,7 +8,7 @@ import { Producto } from '../models/producto';
   providedIn: 'root'
 })
 export class InventarioService {
-  private apiUrl = 'http://localhost:3000/productos'; // Endpoint de JSON Server
+  private apiUrl = 'http://localhost:3000/api/productos'; // Endpoint de JSON Server
   private productosSubject = new BehaviorSubject<Producto[]>([]);
   productos$ = this.productosSubject.asObservable();
 
